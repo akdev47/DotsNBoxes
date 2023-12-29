@@ -6,11 +6,13 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -23,15 +25,30 @@ public class DotsAndBoxes extends Application {
 
     private Game game;
 
+    private Button resetButton;
+    private Button startButton;
+    private HBox buttonBox;
     private Text infoText;
     private Text player1ScoreText;
     private Text player2ScoreText;
+
+    private Stage gameScreen;
+    private Scene gameScene;
+    private Scene gameOverScene;
+
+    private Scene startScene;
+
+
+    private Group startGroup;
+    private Group gameGroup;
+    private Group gameOverGroup;
 
     public static final int GRID_SIZE = 6; // Adjust grid size as needed
     private static final double DOT_RADIUS = 7.0;
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage gameScreen) {
+        this.gameScreen = gameScreen;
         game = new Game();
         pane = new Pane();
         drawDots(pane);
@@ -40,6 +57,11 @@ public class DotsAndBoxes extends Application {
         infoText.setStyle("-fx-font-size: 14;");
 
 
+
+//        buttonBox = new HBox(resetButton);
+//        buttonBox.setLayoutX(130);
+//        buttonBox.setLayoutY(460);
+
         player1ScoreText = new Text("Player 1 score: 0");
         infoText.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
 
@@ -47,8 +69,48 @@ public class DotsAndBoxes extends Application {
         infoText.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
 
 
-        Group group = new Group(pane,infoText, player1ScoreText,player2ScoreText);
-        Scene scene = new Scene(group, 500, 500);
+        gameGroup = new Group(pane,infoText, player1ScoreText,player2ScoreText);
+
+
+        Image startBackgroundImage = new Image(getClass().getResourceAsStream(""));
+        ImageView backgroundImageView = new ImageView(startBackgroundImage);
+
+        backgroundImageView.setFitWidth(gameScreen.getWidth());
+        backgroundImageView.setFitHeight(gameScreen.getHeight());
+
+        startButton = new Button("Start Game");
+        startButton.setStyle("-fx-font-size: 13; -fx-padding: 10;");
+        startButton.setOnAction(e -> startGame());
+        startButton.setLayoutX(210);
+        startButton.setLayoutY(250);
+
+        startGroup = new Group(startButton,backgroundImageView);
+
+
+
+
+
+
+
+        Text gameOverText = new Text("Game Over!");
+        gameOverText.setStyle("-fx-font-size: 20;");
+        gameOverText.setLayoutX(200);
+        gameOverText.setLayoutY(200);
+
+        resetButton = new Button("Reset Game");
+        resetButton.setStyle("-fx-font-size: 10; -fx-padding: 8;");
+        resetButton.setOnAction(e -> resetGame());
+        resetButton.setLayoutX(210);
+        resetButton.setLayoutY(250);
+
+        gameOverGroup = new Group(gameOverText,resetButton);
+
+        startScene = new Scene(startGroup,500,500);
+        gameOverScene = new Scene(gameOverGroup, 500, 500);
+
+
+        gameScene = new Scene(gameGroup, 500, 500);
+
         infoText.setLayoutX(50);
         infoText.setLayoutY(480);
 
@@ -60,14 +122,14 @@ public class DotsAndBoxes extends Application {
         pane.setMinSize(500, 500);
         pane.setMaxSize(500, 500);
 
-        primaryStage.setTitle("Dots and Boxes");
-        primaryStage.setScene(scene);
+        gameScreen.setTitle("Dots and Boxes");
+        gameScreen.setScene(startScene);
 
-        primaryStage.setResizable(false);
+        gameScreen.setResizable(false);
 
         pane.setOnMouseClicked(this::handleMouseClick);
 
-        primaryStage.show();
+        gameScreen.show();
     }
 
     private void handleMouseClick(MouseEvent event) {
@@ -108,6 +170,10 @@ public class DotsAndBoxes extends Application {
                 clickedDot = null;
 
             }
+        }
+
+        if(game.isGameOver()) {
+            gameScreen.setScene(gameOverScene);
         }
 
 
@@ -498,6 +564,25 @@ public class DotsAndBoxes extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public void resetGame() {
+
+    gameScreen.setScene(gameScene);
+    pane.getChildren().clear();
+
+    startDot = null;
+    player1ScoreText.setText("Player 1 score: 0");
+    player2ScoreText.setText("Player 2 score: 0");
+    infoText.setText("Player 1 turn");
+    game.resetGame();
+
+    drawDots(pane);
+
+    }
+
+    public void startGame() {
+        gameScreen.setScene(gameScene);
     }
 }
 

@@ -32,7 +32,13 @@ public class Game {
     }
 
     public boolean isGameOver() {
-        return (player1.getPlayerScore()== maxScore || player2.getPlayerScore()==maxScore);
+        return ((player1.getPlayerScore() + player2.getPlayerScore())==maxScore);
+    }
+
+    public void resetGame() {
+        gameTurnPlayer1 = true;
+        player1.resetPlayerScore();
+        player2.resetPlayerScore();
     }
 
     public void switchTurn() {

@@ -23,4 +23,8 @@ public class Player {
     public Color getColor() {
         return playerColor;
     }
+
+    public void resetPlayerScore() {
+        playerScore = 0;
+    }
 }

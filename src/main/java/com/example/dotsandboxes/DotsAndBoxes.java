@@ -123,7 +123,7 @@ public class DotsAndBoxes extends Application {
         ConnectLine line = new ConnectLine(startDot.getCenterX(), startDot.getCenterY(),
          endDot.getCenterX(), endDot.getCenterY(),game.getCurrentPlayerColor(),firstDot,lastDot);
 
-        line.setStrokeWidth(6);
+        line.setStrokeWidth(4);
 
 //        game.switchTurn();
         pane.getChildren().add(line);
@@ -230,6 +230,8 @@ public class DotsAndBoxes extends Application {
                 boolean a = checkRightSide(firstDot, lastDot, startDot, endDot, connectedLine);
                 boolean b = checkLeftSide(firstDot,lastDot,startDot,endDot,connectedLine);
 
+
+
                 if(a&&b) {
                     if(game.isGameTurnPlayer1()) {
                         game.incrementPlayer1Score();
@@ -313,8 +315,6 @@ public class DotsAndBoxes extends Application {
             if (firstDot.getConnectedRightDot() == lastDot) {
                 assert lastDot != null;
                 if (lastDot.getConnectedLeftDot() == firstDot) {
-                    assert nextLine1 != null;
-                    if (nextLine1.getLineColor() == firstLineColor) {
                         System.out.println("Ok3");
                         firstDot = getDotAt(startDot.getRow() + 1, startDot.getCol() + 1);
                         lastDot = getDotAt(endDot.getRow() - 1, endDot.getCol() + 1);
@@ -337,7 +337,7 @@ public class DotsAndBoxes extends Application {
 
                             }
                         }
-                    }
+
                 }
             }
         }

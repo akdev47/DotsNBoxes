@@ -82,4 +82,18 @@ public class Dot extends Circle {
         return connectedLeftDot;
     }
 
+    public boolean isSameDot(Dot dotx) {
+
+        return (this.row== dotx.getRow() && this.col == dotx.getCol());
+
+    }
+
+    public boolean isDotFullyConnected() {
+
+        return this.getConnectedUpDot() != null && this.getConnectedDownDot() != null
+                && this.getConnectedRightDot() != null && this.getConnectedLeftDot() != null;
+
+    }
+
+
 }

@@ -1,6 +1,9 @@
 package com.example.dotsandboxes;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import javafx.animation.*;
 import javafx.application.Application;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -16,6 +19,10 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.util.Duration;
 
 public class DotsAndBoxes extends Application {
 
@@ -32,6 +39,8 @@ public class DotsAndBoxes extends Application {
     private Text player1ScoreText;
     private Text player2ScoreText;
 
+    private Text gameOverText;
+
     private Stage gameScreen;
     private Scene gameScene;
     private Scene gameOverScene;
@@ -43,7 +52,7 @@ public class DotsAndBoxes extends Application {
     private Group gameGroup;
     private Group gameOverGroup;
 
-    public static final int GRID_SIZE = 6; // Adjust grid size as needed
+    public static final int GRID_SIZE = 6;
     private static final double DOT_RADIUS = 7.0;
 
     @Override
@@ -92,9 +101,9 @@ public class DotsAndBoxes extends Application {
 
 
 
-        Text gameOverText = new Text("Game Over!");
+        gameOverText = new Text("Game Over!");
         gameOverText.setStyle("-fx-font-size: 20;");
-        gameOverText.setLayoutX(200);
+        gameOverText.setLayoutX(80);
         gameOverText.setLayoutY(200);
 
         resetButton = new Button("Reset Game");
@@ -145,34 +154,56 @@ public class DotsAndBoxes extends Application {
 
                 startDot = clickedDot;
 
-                startDot.setFill(game.getCurrentPlayerColor());
-            } else if (areAdjacentDots( startDot, clickedDot)) {
-                drawLineBetweenDots( startDot, clickedDot);
-                startDot.setFill(Color.BLACK);
-                setConnectedDots(startDot,clickedDot);
-                if(!checkIfSquare(startDot,clickedDot)) {
-                    game.switchTurn();
-                    infoText.setText(game.toString());
+                if(startDot.isDotFullyConnected()) {
+                    startDot = null;
                 }
                 else {
-                    if(game.isGameTurnPlayer1()) {
-                        game.incrementPlayer1Score();
-                        player1ScoreText.setText("Player 1 score: " + game.getPlayer1().getPlayerScore());
-                    }
-                    else {
-                        game.incrementPlayer2Score();
-                        player2ScoreText.setText("Player 2 score: " + game.getPlayer2().getPlayerScore());
-                    }
-
+                    startDot.setFill(game.getCurrentPlayerColor());
                 }
 
-                startDot = null;
-                clickedDot = null;
+
+            } else if (areAdjacentDots( startDot, clickedDot)) {
+
+                if(getLineBetweenDots(startDot,clickedDot)==null) {
+                    drawLineBetweenDots( startDot, clickedDot);
+                    startDot.setFill(Color.BLACK);
+                    setConnectedDots(startDot,clickedDot);
+                    if(!checkIfSquare(startDot,clickedDot)) {
+                        game.switchTurn();
+                        infoText.setText(game.toString());
+                    }
+                    else {
+                        if(game.isGameTurnPlayer1()) {
+                            game.incrementPlayer1Score();
+                            player1ScoreText.setText("Player 1 score: " + game.getPlayer1().getPlayerScore());
+                        }
+                        else {
+                            game.incrementPlayer2Score();
+                            player2ScoreText.setText("Player 2 score: " + game.getPlayer2().getPlayerScore());
+                        }
+
+                    }
+
+                    startDot = null;
+                }
+
 
             }
         }
 
         if(game.isGameOver()) {
+            int player1S = game.getPlayer1().getPlayerScore();
+            int player2S = game.getPlayer2().getPlayerScore();
+            String winnerPlayer;
+
+            if(player1S>player2S) {
+               winnerPlayer = game.getPlayer1().getName();
+            }
+            else {
+                winnerPlayer = game.getPlayer2().getName();
+
+            }
+            gameOverText.setText("Game Over! Player " + winnerPlayer+  " won. Final Score: " + player1S+"-"+player2S);
             gameScreen.setScene(gameOverScene);
         }
 
@@ -186,13 +217,58 @@ public class DotsAndBoxes extends Application {
         Dot firstDot = getDotAt(startDot.getRow(), startDot.getCol());
         Dot lastDot = getDotAt(endDot.getRow(), endDot.getCol());
 
+
         ConnectLine line = new ConnectLine(startDot.getCenterX(), startDot.getCenterY(),
          endDot.getCenterX(), endDot.getCenterY(),game.getCurrentPlayerColor(),firstDot,lastDot);
 
+        System.out.println("Start Dot: (" + startDot.getCenterX() + ", " + startDot.getCenterY() + ")");
+        System.out.println("End Dot: (" + endDot.getCenterX() + ", " + endDot.getCenterY() + ")");
+        System.out.println("Line Start: (" + line.getStartX() + ", " + line.getStartY() + ")");
+        System.out.println("Line End: (" + line.getEndX() + ", " + line.getEndY() + ")");
+
+        double startX = startDot.getCenterX();
+        double startY = startDot.getCenterY();
+        double endX = endDot.getCenterX();
+        double endY = endDot.getCenterY();
+
+
         line.setStrokeWidth(4);
 
+
+
 //        game.switchTurn();
+
+
+
+
+
+
+
+
+
+
         pane.getChildren().add(line);
+
+
+        double duration = 500;
+
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.ZERO, new KeyValue(line.endXProperty(), startDot.getCenterX())),
+                new KeyFrame(Duration.ZERO, new KeyValue(line.endYProperty(), startDot.getCenterY())),
+                new KeyFrame(Duration.millis(duration), new KeyValue(line.endXProperty(), endDot.getCenterX())),
+                new KeyFrame(Duration.millis(duration), new KeyValue(line.endYProperty(), endDot.getCenterY()))
+        );
+
+        timeline.play();
+
+
+
+
+        startDot.toFront();
+        endDot.toFront();
+
+
+
     }
 
     private void setConnectedDots(Dot startDot, Dot endDot) {
@@ -200,25 +276,35 @@ public class DotsAndBoxes extends Application {
         Dot firstDot = getDotAt(startDot.getRow(), startDot.getCol());
         Dot lastDot = getDotAt(endDot.getRow(), endDot.getCol());
 
-        assert firstDot != null;
-        assert lastDot != null;
 
         if(startDot.getCol()-endDot.getCol()==-1) {
             firstDot.setConnectedRightDot(lastDot);
             lastDot.setConnectedLeftDot(firstDot);
+
+            startDot.setConnectedRightDot(endDot);
+            endDot.setConnectedLeftDot(startDot);
         }
 
         else if(startDot.getCol()-endDot.getCol()==1) {
             firstDot.setConnectedLeftDot(lastDot);
             lastDot.setConnectedRightDot(firstDot);
+
+            startDot.setConnectedLeftDot(endDot);
+            endDot.setConnectedRightDot(firstDot);
         }
         else if(startDot.getRow()-endDot.getRow()==-1) {
             firstDot.setConnectedDownDot(lastDot);
             lastDot.setConnectedUpDot(firstDot);
+
+            startDot.setConnectedDownDot(endDot);
+            endDot.setConnectedUpDot(startDot);
         }
         else if(startDot.getRow()-endDot.getRow()==1) {
             firstDot.setConnectedUpDot(lastDot);
             lastDot.setConnectedDownDot(firstDot);
+
+            startDot.setConnectedUpDot(endDot);
+            endDot.setConnectedDownDot(startDot);
         }
 
 
@@ -240,12 +326,18 @@ public class DotsAndBoxes extends Application {
         for (Node node : pane.getChildren()) {
             if (node instanceof ConnectLine) {
                 ConnectLine line = (ConnectLine) node;
-                if ((line.getStartDot() == startDot && line.getEndDot() == endDot) ||
-                        (line.getStartDot() == endDot && line.getEndDot()== startDot)) {
+                Dot lineStartDot = line.getStartDot();
+                Dot lineEndDot = line.getEndDot();
+
+
+                if ((lineStartDot.isSameDot(startDot) && lineEndDot.isSameDot(endDot) ) ||
+                        (lineStartDot.isSameDot(endDot) && lineEndDot.isSameDot(startDot))) {
+                    System.out.println("Found line between dots!");
                     return line;
                 }
             }
         }
+        System.out.println("No line found between dots.");
         return null;
     }
 
@@ -318,6 +410,7 @@ public class DotsAndBoxes extends Application {
 
     public boolean checkTopSide(Dot firstDot, Dot lastDot, Dot startDot, Dot endDot, ConnectLine connectedLine) {
 
+
         Color firstLineColor = connectedLine.getLineColor();
 
         if(lastDot.getCol()<firstDot.getCol()) {
@@ -349,7 +442,8 @@ public class DotsAndBoxes extends Application {
 
                     if (firstDot != null && lastDot != null &&
                             firstDot.getConnectedUpDot() == lastDot && lastDot.getConnectedDownDot()==firstDot) {
-                        System.out.println("SQUARE TOP SIDE");
+                        fillInSquare(startDot,endDot,getDotAt(endDot.getRow()+1, endDot.getCol()),getDotAt(
+                                startDot.getRow()+1, startDot.getCol()));
                         return true;
                     }
                 }
@@ -398,6 +492,8 @@ public class DotsAndBoxes extends Application {
 
                                     if (firstDot != null && lastDot != null && firstDot.getConnectedLeftDot() == lastDot && lastDot.getConnectedRightDot() == firstDot) {
                                         System.out.println("SQUARE LEFT SIDE");
+                                        fillInSquare(startDot,endDot,getDotAt(endDot.getRow(), endDot.getCol()+1),getDotAt(
+                                                startDot.getRow(), startDot.getCol()+1));
                                         return true;
                                     }
 
@@ -449,6 +545,8 @@ public class DotsAndBoxes extends Application {
 
                                     if (firstDot != null && lastDot != null && firstDot.getConnectedDownDot() == lastDot && lastDot.getConnectedUpDot() == firstDot) {
                                         System.out.println("SQUARE BOTTOM SIDE");
+                                        fillInSquare(startDot,endDot,getDotAt(endDot.getRow()-1, endDot.getCol()),getDotAt(
+                                                startDot.getRow()-1, startDot.getCol()));
                                         return true;
                                     }
 
@@ -502,6 +600,8 @@ public class DotsAndBoxes extends Application {
 
                                     if (firstDot != null && lastDot != null && firstDot.getConnectedRightDot() == lastDot && lastDot.getConnectedLeftDot() == firstDot) {
                                         System.out.println("SQUARE RIGHT SIDE");
+                                        fillInSquare(startDot,endDot,getDotAt(endDot.getRow(), endDot.getCol()-1),getDotAt(
+                                                startDot.getRow(), startDot.getCol()-1));
                                         return true;
                                     }
 
@@ -557,8 +657,22 @@ public class DotsAndBoxes extends Application {
                 dot4.getCenterX(), dot4.getCenterY()
         );
 
+        System.out.println("square filled");
         square.setFill(game.getCurrentPlayerColor());
         pane.getChildren().add(square);
+
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.ZERO, new KeyValue(square.fillProperty(), Color.TRANSPARENT)),
+                new KeyFrame(Duration.millis(500), new KeyValue(square.fillProperty(), game.getCurrentPlayerColor()))
+        );
+
+        timeline.play();
+
+        dot1.toFront();
+        dot2.toFront();
+        dot3.toFront();
+        dot4.toFront();
+
     }
 
 
@@ -584,5 +698,7 @@ public class DotsAndBoxes extends Application {
     public void startGame() {
         gameScreen.setScene(gameScene);
     }
+
+
 }
 

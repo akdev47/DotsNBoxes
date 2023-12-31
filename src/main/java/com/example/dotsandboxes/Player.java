@@ -7,9 +7,12 @@ public class Player {
 
     private int playerScore = 0;
     private Color playerColor;
+    private String name;
 
-    public Player(Color color) {
+    public Player(Color color, String name) {
+
         playerColor = color;
+        this.name = name;
     }
 
     public int getPlayerScore() {
@@ -26,5 +29,9 @@ public class Player {
 
     public void resetPlayerScore() {
         playerScore = 0;
+    }
+
+    public String getName() {
+        return name;
     }
 }

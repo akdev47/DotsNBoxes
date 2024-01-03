@@ -9,6 +9,7 @@ public class Player {
     private Color playerColor;
     private String name;
 
+
     public Player(Color color, String name) {
 
         playerColor = color;

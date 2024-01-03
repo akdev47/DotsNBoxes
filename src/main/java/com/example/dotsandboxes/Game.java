@@ -18,8 +18,6 @@ public class Game {
     private double maxScore;
 
     public Game() {
-        player1 = new Player(Color.RED, "1");
-        player2 = new Player(Color.BLUE,"2");
         maxScore = Math.pow(GRID_SIZE-1,2);
     }
 
@@ -80,6 +78,11 @@ public class Game {
 
     public Player getPlayer2() {
         return player2;
+    }
+
+    public void setPlayers(Player player1, Player player2) {
+        this.player1 = player1;
+        this.player2 = player2;
     }
 
 

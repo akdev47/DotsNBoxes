@@ -95,5 +95,40 @@ public class Dot extends Circle {
 
     }
 
+    public void printDotConnections(Dot dot1, Dot dot2) {
+        if (dot1.getConnectedUpDot() != null) {
+        System.out.println("First dot is connected to up");
+        }
+        if(dot1.getConnectedDownDot() != null) {
+            System.out.println("First dot is connected to down");
+        }
+        if(dot1.getConnectedRightDot()!=null) {
+            System.out.println("First dot is connected to right");
+        }
+        if(dot1.getConnectedLeftDot()!=null) {
+            System.out.println("First dot is connected to left");
+        }
+
+        if (dot2.getConnectedUpDot() != null) {
+            System.out.println("Second dot is connected to up");
+        }
+        if(dot2.getConnectedDownDot() != null) {
+            System.out.println("Second dot is connected to down");
+        }
+        if(dot2.getConnectedRightDot()!=null) {
+            System.out.println("Second dot is connected to right");
+        }
+        if(dot2.getConnectedLeftDot()!=null) {
+            System.out.println("Second dot is connected to left");
+        }
+
+
+
+
+}
+
+
+
+
 
 }

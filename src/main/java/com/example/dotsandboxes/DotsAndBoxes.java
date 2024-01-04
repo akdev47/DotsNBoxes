@@ -300,7 +300,7 @@ public class DotsAndBoxes extends Application {
                 if (!game.isGameTurnPlayer1()) {
                     boolean keepFindingSquare = true;
                     while (keepFindingSquare && !isGameOver()) {
-                        keepFindingSquare = makeAIMoveForPoint();
+                        keepFindingSquare = makeAIMoveForPoint(4);
                         if (isGameOver()) {
                             break;
                         }
@@ -309,24 +309,34 @@ public class DotsAndBoxes extends Application {
                 else {
                     boolean keepFindingSquare = true;
                     while (keepFindingSquare && !isGameOver()) {
-                        keepFindingSquare = makeAIMoveForPoint();
+                        keepFindingSquare = makeAIMoveForPoint(4);
                         if (isGameOver()) {
                             break;
                         }
                     }
                 }
 
+//                boolean oneMovesAvailable = true;
+//                if (!isGameOver()) {
+//                   oneMovesAvailable = makeAIMoveForPoint(1);
+//                }
+//
+//                boolean twoMovesAvailable = true;
+//                if(!isGameOver() &&  !oneMovesAvailable) {
+//                    twoMovesAvailable  = makeAIMoveForPoint(2);
+//                }
 
-                PauseTransition additionalPause2 = new PauseTransition(Duration.millis(700));
-                additionalPause2.setOnFinished(e2 -> {
+
+//                PauseTransition additionalPause2 = new PauseTransition(Duration.millis(700));
+//                additionalPause2.setOnFinished(e2 -> {
                     if (!isGameOver()) {
                         makeRandomAIMove();
                     }
 
                     game.switchTurn();
                     infoText.setText(game.toString());
-                });
-                additionalPause2.play();
+//                });
+//                additionalPause2.play();
             }
 
         });
@@ -340,7 +350,7 @@ public class DotsAndBoxes extends Application {
             if (!game.isGameTurnPlayer1()) {
                 boolean keepFindingSquare = true;
                 while (keepFindingSquare && !isGameOver()) {
-                    keepFindingSquare = makeAIMoveForPoint();
+                    keepFindingSquare = makeAIMoveForPoint(4);
                     if (isGameOver()) {
                         break;
                     }
@@ -348,13 +358,15 @@ public class DotsAndBoxes extends Application {
             } else {
                 boolean keepFindingSquare = true;
                 while (keepFindingSquare && !isGameOver()) {
-                    keepFindingSquare = makeAIMoveForPoint();
+                    keepFindingSquare = makeAIMoveForPoint(4);
 
                     if (isGameOver()) {
                         break;
                     }
                 }
             }
+
+
 
             PauseTransition additionalPause2 = new PauseTransition(Duration.millis(200));
             additionalPause2.setOnFinished(e2 -> {
@@ -371,7 +383,7 @@ public class DotsAndBoxes extends Application {
         });
         additionalPause.play();
     }
-    public boolean makeAIMoveForPoint() {
+    public boolean makeAIMoveForPoint(int sideCount) {
 
         boolean foundMove = false;
 
@@ -399,7 +411,7 @@ public class DotsAndBoxes extends Application {
 
 
 
-                    if(checkIfSquareOrThreeSides(paneCopy, startCopyDot, endCopyDot,4)) {
+                    if(checkIfSquareOrThreeSides(paneCopy, startCopyDot, endCopyDot,sideCount)) {
 
                         drawLineBetweenDots(pane,startDot, endDot);
                         setConnectedDots(pane,startDot,endDot);
@@ -409,15 +421,17 @@ public class DotsAndBoxes extends Application {
 
                         foundMove = true;
 
+                        if(sideCount==4) {
+                            if(game.isGameTurnPlayer1()) {
+                                game.incrementPlayer1Score();
+                                player1ScoreText.setText("Player 1 score: " + game.getPlayer1().getPlayerScore());
+                            }
+                            else {
+                                game.incrementPlayer2Score();
+                                player2ScoreText.setText("Player 2 score: " + game.getPlayer2().getPlayerScore());
+                            }
+                        }
 
-                        if(game.isGameTurnPlayer1()) {
-                            game.incrementPlayer1Score();
-                            player1ScoreText.setText("Player 1 score: " + game.getPlayer1().getPlayerScore());
-                        }
-                        else {
-                            game.incrementPlayer2Score();
-                            player2ScoreText.setText("Player 2 score: " + game.getPlayer2().getPlayerScore());
-                        }
 
                         return true;
                     }
@@ -491,37 +505,163 @@ public class DotsAndBoxes extends Application {
                 int randomRow = (int) Math.floor(Math.random() * 6);
                 int randomCol = (int) Math.floor(Math.random() * 5);
 
-                Dot startDot = getDotAt(pane,randomRow,randomCol);
-                Dot endDot = getDotAt(pane,randomRow,randomCol+1);
+                Pane paneCopy = duplicatePane(pane);
+                copyDotsConnectionRelationship(pane,paneCopy);
 
-                if(getLineBetweenDots(pane,startDot,endDot)==null) {
-                    setConnectedDots(pane,startDot,endDot);
-                    drawLineBetweenDots(pane,startDot, endDot);
+                Dot startDot = getDotAt(paneCopy,randomRow,randomCol);
+                Dot endDot = getDotAt(paneCopy,randomRow,randomCol+1);
 
-                    moveFound=true;
 
-                    //                    System.out.println("AI HAS MADE A MOVE IN ROW :" + randomRow + "AND  BETWEEN COLUMN: " + randomCol + " AND " + randomCol+1);
+
+                drawLineBetweenDots(paneCopy,startDot, endDot);
+                setConnectedDots(paneCopy, startDot, endDot);
+
+                Dot OGstartDot = getDotAt(pane,randomRow,randomCol);
+                Dot OGendDot = getDotAt(pane,randomRow,randomCol+1);
+
+                if(!checkAnyLeftLines(pane)) {
+                    if(getLineBetweenDots(pane,OGstartDot,OGendDot)==null && !checkIfSquareOrThreeSides(paneCopy,startDot,endDot,3)) {
+                        setConnectedDots(pane,OGstartDot,OGendDot);
+                        drawLineBetweenDots(pane,OGstartDot, OGendDot);
+
+                        moveFound=true;
+
+                        //                    System.out.println("AI HAS MADE A MOVE IN ROW :" + randomRow + "AND  BETWEEN COLUMN: " + randomCol + " AND " + randomCol+1);
+                    }
                 }
+                else {
+                    if(getLineBetweenDots(pane,OGstartDot,OGendDot)==null) {
+                        setConnectedDots(pane,OGstartDot,OGendDot);
+                        drawLineBetweenDots(pane,OGstartDot, OGendDot);
+
+                        moveFound=true;
+
+                        //                    System.out.println("AI HAS MADE A MOVE IN ROW :" + randomRow + "AND  BETWEEN COLUMN: " + randomCol + " AND " + randomCol+1);
+                    }
+                }
+
+
+
             }
             else {
                 int randomRow = (int) Math.floor(Math.random() * 5);
                 int randomCol = (int) Math.floor(Math.random() * 6);
 
-                Dot startDot = getDotAt(pane,randomRow,randomCol);
-                Dot endDot = getDotAt(pane,randomRow+1,randomCol);
+                Pane paneCopy = duplicatePane(pane);
+                copyDotsConnectionRelationship(pane,paneCopy);
 
-                if(getLineBetweenDots(pane,startDot,endDot)==null) {
-                    setConnectedDots(pane,startDot,endDot);
-                    drawLineBetweenDots(pane,startDot, endDot);
+                Dot startDot = getDotAt(paneCopy,randomRow,randomCol);
+                Dot endDot = getDotAt(paneCopy,randomRow+1,randomCol);
 
-                    moveFound = true;
 
-                    //                    System.out.println("AI HAS MADE A MOVE IN ROW :" + randomRow + "AND  BETWEEN COLUMN: " + randomCol + " AND " + randomCol+1);
+
+                drawLineBetweenDots(paneCopy,startDot, endDot);
+                setConnectedDots(paneCopy, startDot, endDot);
+
+                Dot OGstartDot = getDotAt(pane,randomRow,randomCol);
+                Dot OGendDot = getDotAt(pane,randomRow+1,randomCol);
+
+                if(!checkAnyLeftLines(pane)) {
+                    if(getLineBetweenDots(pane,OGstartDot,OGendDot)==null && !checkIfSquareOrThreeSides(paneCopy,startDot,endDot,3)) {
+                        setConnectedDots(pane,OGstartDot,OGendDot);
+                        drawLineBetweenDots(pane,OGstartDot, OGendDot);
+
+                        moveFound=true;
+
+                        //                    System.out.println("AI HAS MADE A MOVE IN ROW :" + randomRow + "AND  BETWEEN COLUMN: " + randomCol + " AND " + randomCol+1);
+                    }
+                }
+                else {
+                    if(getLineBetweenDots(pane,OGstartDot,OGendDot)==null) {
+                        setConnectedDots(pane,OGstartDot,OGendDot);
+                        drawLineBetweenDots(pane,OGstartDot, OGendDot);
+
+                        moveFound=true;
+
+                        //                    System.out.println("AI HAS MADE A MOVE IN ROW :" + randomRow + "AND  BETWEEN COLUMN: " + randomCol + " AND " + randomCol+1);
+                    }
                 }
             }
 
         }
     }
+
+    public boolean checkAnyLeftLines(Pane pane) {
+
+
+        //check horizontally
+        for(int row=0;row<GRID_SIZE;row++) {
+            for(int col=0;col<GRID_SIZE-1;col++) {
+                Dot startDot = getDotAt(pane,row,col);
+                Dot endDot = getDotAt(pane,row,col+1);
+
+                if(getLineBetweenDots(pane,startDot,endDot)==null) {
+                    //                    System.out.println("AI IS ATTEMPTING TO DRAW A LINE IN ROW :" + row + "AND  BETWEEN COLUMN: " + col + " AND " + Math.addExact(col,1));
+
+                    Pane paneCopy = duplicatePane(pane);
+                    Dot startCopyDot = getDotAt(paneCopy,row,col);
+                    Dot endCopyDot = getDotAt(paneCopy,row,col+1);
+
+                    drawLineBetweenDots(paneCopy,startCopyDot, endCopyDot);
+                    setConnectedDots(paneCopy, startCopyDot, endCopyDot);
+
+
+
+                    //                    System.out.println("Original Pane Children Count: " + pane.getChildren().size());
+                    //                    System.out.println("Duplicated Pane Children Count: " + paneCopy.getChildren().size());
+
+
+
+                    if(!checkIfSquareOrThreeSides(paneCopy, startCopyDot, endCopyDot,3)) {
+                       return false;
+
+                    }
+
+
+
+                }
+
+
+            }
+
+        }
+
+
+
+
+        //check horizontally
+        for(int col=0;col<GRID_SIZE;col++) {
+            for(int row=0;row<GRID_SIZE-1;row++) {
+                Dot startDot = getDotAt(pane,row,col);
+                Dot endDot = getDotAt(pane,row+1,col);
+
+                if(getLineBetweenDots(pane,startDot,endDot)==null) {
+                    //                    System.out.println("AI IS ATTEMPTING TO DRAW A LINE IN ROW :" + row + "AND  BETWEEN COLUMN: " + col + " AND " + Math.addExact(col,1));
+
+                    Pane paneCopy = duplicatePane(pane);
+                    Dot startCopyDot = getDotAt(paneCopy,row,col);
+                    Dot endCopyDot = getDotAt(paneCopy,row+1,col);
+
+                    drawLineBetweenDots(paneCopy,startCopyDot, endCopyDot);
+                    setConnectedDots(paneCopy, startCopyDot, endCopyDot);
+
+                    if(!checkIfSquareOrThreeSides(paneCopy, startCopyDot, endCopyDot,3)) {
+                        return false;
+
+                    }
+
+
+
+                }
+
+
+            }
+
+        }
+        return true;
+    }
+
+
 
     private boolean isGameOver() {
         if(game.isGameOver()) {
@@ -668,7 +808,7 @@ public class DotsAndBoxes extends Application {
         } else if (firstDot.getCol()==0 && firstDot.getRow()< GRID_SIZE && Objects.requireNonNull(
                 lastDot).getCol()==0) {
             assert connectedLine != null;
-            return getLeftSideLineNum(pane, firstDot, lastDot, startDot, endDot)==4;
+            return getLeftSideLineNum(pane, firstDot, lastDot, startDot, endDot)==sideCount;
         }
         else if (firstDot.getRow()==GRID_SIZE-1 && firstDot.getCol()< GRID_SIZE && Objects.requireNonNull(
                 lastDot).getRow()==GRID_SIZE-1) {
@@ -687,7 +827,7 @@ public class DotsAndBoxes extends Application {
                 boolean a = getTopSideLineNum(pane, firstDot, lastDot, startDot, endDot)==sideCount;
                 boolean b = getBottomSideLineNum(pane, firstDot, lastDot, startDot, endDot)==sideCount;
 
-                if(a&b) {
+                if(a&b && sideCount==4) {
                     if(game.isGameTurnPlayer1()) {
                         game.incrementPlayer1Score();
                     }
@@ -695,7 +835,14 @@ public class DotsAndBoxes extends Application {
                         game.incrementPlayer2Score();
                     }
                 }
-                return a | b;
+
+                if(sideCount==1) {
+                    return a && b;
+                }
+                else {
+                    return a || b;
+                }
+
             }
             else if (firstDot.getCol()==lastDot.getCol() && Math.abs(firstDot.getRow()-lastDot.getRow())==1) {
                 assert connectedLine != null;
@@ -704,7 +851,7 @@ public class DotsAndBoxes extends Application {
 
 
 
-                if(a&&b) {
+                if(a&&b && sideCount==4) {
                     if(game.isGameTurnPlayer1()) {
                         game.incrementPlayer1Score();
                     }
@@ -712,7 +859,12 @@ public class DotsAndBoxes extends Application {
                         game.incrementPlayer2Score();
                     }
                 }
-                return a | b;
+                if(sideCount==1) {
+                    return a && b;
+                }
+                else {
+                    return a || b;
+                }
             }
             else {
                 return false;
@@ -729,9 +881,6 @@ public class DotsAndBoxes extends Application {
 
         int lineCount = 0;
 
-
-
-
         if(lastDot.getCol()<firstDot.getCol()) {
             Dot temp = firstDot;
             firstDot = lastDot;
@@ -743,34 +892,43 @@ public class DotsAndBoxes extends Application {
 //        System.out.println("Ok1");
         if (firstDot.getConnectedRightDot() == lastDot &&  lastDot.getConnectedLeftDot() == firstDot) {
             lineCount++;
-//            System.out.println("Ok2");
+        }
+            //            System.out.println("Ok2");
             firstDot = getDotAt(pane, startDot.getRow(), startDot.getCol() + 1);
-            lastDot = getDotAt(pane, endDot.getRow()+1, endDot.getCol());
+            lastDot = getDotAt(pane, endDot.getRow() + 1, endDot.getCol());
 
 
             if (firstDot.getConnectedDownDot() == lastDot && lastDot.getConnectedUpDot() == firstDot) {
                 lineCount++;
-//                System.out.println("Ok3");
-                firstDot = getDotAt(pane, startDot.getRow()+1, startDot.getCol()+1);
-                lastDot = getDotAt(pane, endDot.getRow()+1, endDot.getCol()-1);
-
-
-                if (firstDot.getConnectedLeftDot() == lastDot && lastDot.getConnectedRightDot()==firstDot) {
-                    lineCount++;
-//                    System.out.println("Ok4");
-                    firstDot = getDotAt(pane,startDot.getRow() + 1, startDot.getCol());
-                    lastDot = getDotAt(pane,endDot.getRow() , endDot.getCol() - 1);
-
-
-                    if (firstDot != null && lastDot != null &&
-                            firstDot.getConnectedUpDot() == lastDot && lastDot.getConnectedDownDot()==firstDot) {
-                        lineCount++;
-                        fillInSquare(startDot,endDot,getDotAt(pane,endDot.getRow()+1, endDot.getCol()),getDotAt(
-                                pane,startDot.getRow()+1, startDot.getCol()));
-                    }
-                }
             }
-        }
+                //                System.out.println("Ok3");
+                firstDot = getDotAt(pane, startDot.getRow() + 1, startDot.getCol() + 1);
+                lastDot = getDotAt(pane, endDot.getRow() + 1, endDot.getCol() - 1);
+
+
+                if (firstDot.getConnectedLeftDot() == lastDot && lastDot.getConnectedRightDot() == firstDot) {
+                    lineCount++;
+                }
+                    //                    System.out.println("Ok4");
+                    firstDot = getDotAt(pane, startDot.getRow() + 1, startDot.getCol());
+                    lastDot = getDotAt(pane, endDot.getRow(), endDot.getCol() - 1);
+
+
+                    if (firstDot != null && lastDot != null && firstDot.getConnectedUpDot() == lastDot && lastDot.getConnectedDownDot() == firstDot) {
+                        lineCount++;
+                    }
+                    if(lineCount==4) {
+                        fillInSquare(startDot, endDot, getDotAt(pane, endDot.getRow() + 1, endDot.getCol()),
+                                     getDotAt(pane, startDot.getRow() + 1, startDot.getCol()));
+                    }
+
+
+
+
+
+
+
+
         return lineCount;
     }
 
@@ -791,45 +949,44 @@ public class DotsAndBoxes extends Application {
 //        System.out.println("Ok1");
         if (firstDot.getConnectedDownDot() == lastDot &&  lastDot.getConnectedUpDot() == firstDot) {
             lineCount++;
-//            System.out.println("Ok2");
-            firstDot = getDotAt(pane,startDot.getRow()+1, startDot.getCol());
-            lastDot = getDotAt(pane,endDot.getRow(), endDot.getCol()+1);
-            ConnectLine nextLine1 = getLineBetweenDots(pane,firstDot,lastDot);
-
-            assert firstDot != null;
-            if (firstDot.getConnectedRightDot() == lastDot) {
-                assert lastDot != null;
-                if (lastDot.getConnectedLeftDot() == firstDot) {
-                    lineCount++;
-//                        System.out.println("Ok3");
-                        firstDot = getDotAt(pane,startDot.getRow() + 1, startDot.getCol() + 1);
-                        lastDot = getDotAt(pane,endDot.getRow() - 1, endDot.getCol() + 1);
-                        ConnectLine nextLine2 = getLineBetweenDots(pane, firstDot, lastDot);
-
-                        assert firstDot != null;
-                        if (firstDot.getConnectedUpDot() == lastDot) {
-                            assert lastDot != null;
-                            if (lastDot.getConnectedDownDot() == firstDot) {
-                                lineCount++;
-//                                  System.out.println("Ok4");
-                                    firstDot = getDotAt(pane,startDot.getRow(), startDot.getCol() + 1);
-                                    lastDot = getDotAt(pane,endDot.getRow() - 1, endDot.getCol());
-                                    ConnectLine nextLine3 = getLineBetweenDots(pane,firstDot, lastDot);
-
-
-                                    if (firstDot != null && lastDot != null && firstDot.getConnectedLeftDot() == lastDot && lastDot.getConnectedRightDot() == firstDot) {
-                                        lineCount++;
-//                                        System.out.println("SQUARE LEFT SIDE");
-                                        fillInSquare(startDot,endDot,getDotAt(pane,endDot.getRow(), endDot.getCol()+1),getDotAt(
-                                                pane,startDot.getRow(), startDot.getCol()+1));
-                                    }
-
-                            }
-                        }
-
-                }
-            }
         }
+
+            //            System.out.println("Ok2");
+            firstDot = getDotAt(pane, startDot.getRow() + 1, startDot.getCol());
+            lastDot = getDotAt(pane, endDot.getRow(), endDot.getCol() + 1);
+            ConnectLine nextLine1 = getLineBetweenDots(pane, firstDot, lastDot);
+
+
+
+            if (firstDot.getConnectedRightDot() == lastDot && lastDot.getConnectedLeftDot() == firstDot) {
+                lineCount++;
+            }
+                //                        System.out.println("Ok3");
+                firstDot = getDotAt(pane, startDot.getRow() + 1, startDot.getCol() + 1);
+                lastDot = getDotAt(pane, endDot.getRow() - 1, endDot.getCol() + 1);
+                ConnectLine nextLine2 = getLineBetweenDots(pane, firstDot, lastDot);
+
+
+                assert firstDot != null;
+                if (firstDot.getConnectedUpDot() == lastDot && lastDot.getConnectedDownDot() == firstDot) {
+                    lineCount++;
+                    //                                  System.out.println("Ok4");
+                    ConnectLine nextLine3 = getLineBetweenDots(pane, firstDot, lastDot);
+                }
+        firstDot = getDotAt(pane, startDot.getRow(), startDot.getCol() + 1);
+        lastDot = getDotAt(pane, endDot.getRow() - 1, endDot.getCol());
+
+
+
+                    if (firstDot != null && lastDot != null && firstDot.getConnectedLeftDot() == lastDot && lastDot.getConnectedRightDot() == firstDot) {
+                        lineCount++;
+                    }
+
+                    if(lineCount==4) {
+                        fillInSquare(startDot, endDot, getDotAt(pane, endDot.getRow(), endDot.getCol() + 1),
+                                     getDotAt(pane, startDot.getRow(), startDot.getCol() + 1));
+                    }
+                        //                                        System.out.println("SQUARE LEFT SIDE");
         return lineCount;
     }
 
@@ -850,27 +1007,25 @@ public class DotsAndBoxes extends Application {
 //        System.out.println("Ok1");
         if (firstDot.getConnectedRightDot() == lastDot &&  lastDot.getConnectedLeftDot() == firstDot) {
             lineCount++;
+        }
 //            System.out.println("Ok2");
             firstDot = getDotAt(pane,startDot.getRow(), startDot.getCol()+1);
             lastDot = getDotAt(pane,endDot.getRow()-1, endDot.getCol());
             ConnectLine nextLine1 = getLineBetweenDots(pane,firstDot,lastDot);
 
-            assert firstDot != null;
-            if (firstDot.getConnectedUpDot() == lastDot) {
-                assert lastDot != null;
-                if (lastDot.getConnectedDownDot() == firstDot) {
-                    lineCount++;
+            if (firstDot.getConnectedUpDot() == lastDot && lastDot.getConnectedDownDot() == firstDot) {
+
+                lineCount++;
+            }
 //                        System.out.println("Ok3");
                         firstDot = getDotAt(pane,startDot.getRow() - 1, startDot.getCol() + 1);
                         lastDot = getDotAt(pane,endDot.getRow() - 1, endDot.getCol() - 1);
                         ConnectLine nextLine2 = getLineBetweenDots(pane,firstDot, lastDot);
 
-                        assert firstDot != null;
-                        if (firstDot.getConnectedLeftDot() == lastDot) {
-                            assert lastDot != null;
-                            if (lastDot.getConnectedRightDot() == firstDot) {
-                                lineCount++;
-//                                    System.out.println("Ok4");
+                        if (firstDot.getConnectedLeftDot() == lastDot && lastDot.getConnectedRightDot() == firstDot) {
+                            lineCount++;
+                        }
+//                                   System.out.println("Ok4");
                                     firstDot = getDotAt(pane,startDot.getRow() - 1, startDot.getCol());
                                     lastDot = getDotAt(pane,endDot.getRow(), endDot.getCol() - 1);
                                     ConnectLine nextLine3 = getLineBetweenDots(pane,firstDot, lastDot);
@@ -878,17 +1033,18 @@ public class DotsAndBoxes extends Application {
 
                                     if (firstDot != null && lastDot != null && firstDot.getConnectedDownDot() == lastDot && lastDot.getConnectedUpDot() == firstDot) {
                                         lineCount++;
-//                                        System.out.println("SQUARE BOTTOM SIDE");
-                                        fillInSquare(startDot,endDot,getDotAt(pane,endDot.getRow()-1, endDot.getCol()),getDotAt(
-                                                pane,startDot.getRow()-1, startDot.getCol()));
                                     }
 
-                            }
-                        }
+                                    if(lineCount==4) {
+                                        fillInSquare(startDot,endDot,getDotAt(pane,endDot.getRow()-1, endDot.getCol()),getDotAt(
+                                                pane,startDot.getRow()-1, startDot.getCol()));
+                                        System.out.println("SQUARE BOTTOM SIDE");
+                                    }
+//
 
-                }
-            }
-        }
+
+
+
         return lineCount;
     }
 
@@ -907,26 +1063,27 @@ public class DotsAndBoxes extends Application {
 //        System.out.println("Ok1");
         if (firstDot.getConnectedDownDot() == lastDot &&  lastDot.getConnectedUpDot() == firstDot) {
             lineCount++;
+        }
 //            System.out.println("Ok2");
             firstDot = getDotAt(pane,startDot.getRow()+1, startDot.getCol());
             lastDot = getDotAt(pane,endDot.getRow(), endDot.getCol()-1);
             ConnectLine nextLine1 = getLineBetweenDots(pane,firstDot,lastDot);
 
-            assert firstDot != null;
-            if (firstDot.getConnectedLeftDot() == lastDot) {
-                assert lastDot != null;
-                if (lastDot.getConnectedRightDot() == firstDot) {
-                    lineCount++;
+
+            if (firstDot.getConnectedLeftDot() == lastDot && lastDot.getConnectedRightDot() == firstDot) {
+
+                lineCount++;
+            }
 //                        System.out.println("Ok3");
                         firstDot = getDotAt(pane,startDot.getRow() + 1, startDot.getCol() - 1);
                         lastDot = getDotAt(pane,endDot.getRow() - 1, endDot.getCol() - 1);
                         ConnectLine nextLine2 = getLineBetweenDots(pane,firstDot, lastDot);
 
-                        assert firstDot != null;
-                        if (firstDot.getConnectedUpDot() == lastDot) {
-                            assert lastDot != null;
-                            if (lastDot.getConnectedDownDot() == firstDot) {
-                                lineCount++;
+
+                        if (firstDot.getConnectedUpDot() == lastDot && lastDot.getConnectedDownDot() == firstDot) {
+
+                            lineCount++;
+                        }
 
 //                                    System.out.println("Ok4");
                                     firstDot = getDotAt(pane,startDot.getRow(), startDot.getCol() - 1);
@@ -935,18 +1092,14 @@ public class DotsAndBoxes extends Application {
 
                                     if (firstDot != null && lastDot != null && firstDot.getConnectedRightDot() == lastDot && lastDot.getConnectedLeftDot() == firstDot) {
                                         lineCount++;
-//                                       System.out.println("SQUARE RIGHT SIDE");
+                                    }
+                                    if(lineCount==4) {
                                         fillInSquare(startDot,endDot,getDotAt(pane,endDot.getRow(), endDot.getCol()-1),getDotAt(
                                                 pane,startDot.getRow(), startDot.getCol()-1));
-
                                     }
+//                                       System.out.println("SQUARE RIGHT SIDE");
 
-                            }
-                        }
 
-                }
-            }
-        }
         return lineCount;
     }
 

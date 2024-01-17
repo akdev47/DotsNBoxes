@@ -6,5 +6,6 @@ module com.example.dotsandboxes {
     requires com.almasb.fxgl.all;
 
     opens com.example.dotsandboxes to javafx.fxml;
+    opens BoardDrawingGame.src to javafx.graphics;
     exports com.example.dotsandboxes;
 }

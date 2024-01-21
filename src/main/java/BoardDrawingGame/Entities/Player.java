@@ -1,5 +1,7 @@
-package BoardDrawingGame.src;
+package BoardDrawingGame.Entities;
 
+import BoardDrawingGame.logic.Utility;
+import BoardDrawingGame.view.Line;
 import javafx.scene.paint.Color;
 
 public class Player {

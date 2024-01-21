@@ -1,4 +1,4 @@
-package BoardDrawingGame.src;
+package BoardDrawingGame.view;
 
 public class Line {
 
@@ -17,22 +17,22 @@ public class Line {
 		this.setVerticalIndex(verticalIndex);
 	}
 	
-	String getHorizontalOrVertical() {
+	public String getHorizontalOrVertical() {
 		return horizontalOrVertical;
 	}
-	void setHorizontalOrVertical(String horizontalOrVertical) {
+	public void setHorizontalOrVertical(String horizontalOrVertical) {
 		this.horizontalOrVertical = horizontalOrVertical;
 	}
-	int getHorizontalIndex() {
+	public int getHorizontalIndex() {
 		return horizontalIndex;
 	}
-	void setHorizontalIndex(int horizontalIndex) {
+	public void setHorizontalIndex(int horizontalIndex) {
 		this.horizontalIndex = horizontalIndex;
 	}
-	int getVerticalIndex() {
+	public int getVerticalIndex() {
 		return verticalIndex;
 	}
-	void setVerticalIndex(int verticalIndex) {
+	public void setVerticalIndex(int verticalIndex) {
 		this.verticalIndex = verticalIndex;
 	}
 	

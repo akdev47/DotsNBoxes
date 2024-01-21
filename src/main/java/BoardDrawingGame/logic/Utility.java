@@ -1,12 +1,12 @@
-package BoardDrawingGame.src;
+package BoardDrawingGame.logic;
 
-import com.example.dotsandboxes.ConnectLine;
-import com.example.dotsandboxes.Dot;
-import javafx.scene.Node;
-import javafx.scene.layout.Pane;
+import BoardDrawingGame.Entities.Board;
+import BoardDrawingGame.view.Dot;
+import BoardDrawingGame.view.Line;
+import BoardDrawingGame.view.SquaresToDrawForUI;
 
 public class Utility {
-	Board board; 
+	private Board board;
 	
 	public Utility (Board board)
 	{

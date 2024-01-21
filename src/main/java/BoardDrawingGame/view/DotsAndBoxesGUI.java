@@ -1,17 +1,14 @@
-package BoardDrawingGame.src;
+package BoardDrawingGame.view;
 
 
-import com.example.dotsandboxes.AIPlayer;
-import com.example.dotsandboxes.ConnectLine;
-import com.example.dotsandboxes.Dot;
-import com.example.dotsandboxes.Utility;
+import BoardDrawingGame.logic.Game;
+import BoardDrawingGame.logic.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Objects;
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.scene.Cursor;
@@ -33,19 +30,17 @@ import javafx.util.Duration;
 
 public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
 
-
-
-
-
     private Pane pane;
     private Dot startDot = null;
 
-    private BoardDrawingGame.src.Game game;
+    private Game game;
 
 
 
     private Button resetButton;
     private Button startButton;
+
+    private Button toggleButton;
     private HBox buttonBox;
     private Text infoText;
     private Text player1ScoreText;
@@ -58,6 +53,11 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
     private Scene gameOverScene;
 
     private Scene startScene;
+
+    private final Color currentTheme = Color.BLACK;
+    private final Color currentThemeOpposite = Color.WHITE;
+
+    private boolean currentThemeDark = true;
 
 
 
@@ -78,9 +78,9 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
         game = new Game();
         game.setMoveMadeListener(this);
         pane = new Pane();
-        drawDots(pane);
 
         infoText = new Text("Player 1 turn");
+        infoText.setFill(Color.WHITE);
         infoText.setStyle("-fx-font-size: 14;");
 
 
@@ -90,9 +90,11 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
         //        buttonBox.setLayoutY(460);
 
         player1ScoreText = new Text("Player 1 score: 0");
+        player1ScoreText.setFill(Color.WHITE);
         infoText.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
 
         player2ScoreText = new Text("Player 2 score: 0");
+        player2ScoreText.setFill(Color.WHITE);
         infoText.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
 
 
@@ -132,6 +134,12 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
         startButton.setLayoutX(210);
         startButton.setLayoutY(250);
 
+        toggleButton = new Button("Switch Game Theme");
+        toggleButton.setStyle("-fx-font-size: 13; -fx-padding: 10;");
+        toggleButton.setOnAction(e -> switchTheme());
+        toggleButton.setLayoutX(180);
+        toggleButton.setLayoutY(300);
+
         ChoiceBox<String> gameModeChoiceBox = new ChoiceBox<>();
         gameModeChoiceBox.getItems().addAll("Player vs Player", "Player vs AI", "AI vs AI");
         gameModeChoiceBox.setValue("Player vs Player");
@@ -161,7 +169,7 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
             System.out.println(isPlayerVsPlayer);
         });
 
-        startGroup = new Group(startButton,imageView, gameModeChoiceBox);
+        startGroup = new Group(startButton,toggleButton,imageView, gameModeChoiceBox);
 
 
 
@@ -170,6 +178,7 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
 
 
         gameOverText = new Text("Game Over!");
+        gameOverText.setFill(Color.WHITE);
         gameOverText.setStyle("-fx-font-size: 20;");
         gameOverText.setLayoutX(80);
         gameOverText.setLayoutY(200);
@@ -183,10 +192,14 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
         gameOverGroup = new Group(gameOverText,resetButton);
 
         startScene = new Scene(startGroup,500,500);
+        startScene.setFill(Color.BLACK);
+
         gameOverScene = new Scene(gameOverGroup, 500, 500);
+        gameOverScene.setFill(Color.BLACK);
 
 
         gameScene = new Scene(gameGroup, 500, 500);
+        gameScene.setFill(Color.BLACK);
 
         infoText.setLayoutX(50);
         infoText.setLayoutY(480);
@@ -201,12 +214,44 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
 
         gameScreen.setTitle("Dots and Boxes");
         gameScreen.setScene(startScene);
-
         gameScreen.setResizable(false);
 
         pane.setOnMouseClicked(this::handleMouseClick);
 
         gameScreen.show();
+    }
+
+    private void switchTheme() {
+
+        if(currentThemeDark) {
+            currentThemeDark = false;
+            gameScene.setFill(currentThemeOpposite);
+            gameOverScene.setFill(currentThemeOpposite);
+            startScene.setFill(currentThemeOpposite);
+            player1ScoreText.setFill(currentTheme);
+            player2ScoreText.setFill(currentTheme);
+            infoText.setFill(currentTheme);
+            gameOverText.setFill(currentTheme);
+
+        }
+        else {
+            currentThemeDark = true;
+            gameScene.setFill(currentTheme);
+            gameOverScene.setFill(currentTheme);
+            startScene.setFill(currentTheme);
+            player1ScoreText.setFill(currentThemeOpposite);
+            player2ScoreText.setFill(currentThemeOpposite);
+            infoText.setFill(currentThemeOpposite);
+            gameOverText.setFill(currentThemeOpposite);
+        }
+
+        if(currentThemeDark) {
+            System.out.println("Current Theme is dark");
+        }
+        else {
+            System.out.println("Current Theme is light");
+        }
+
     }
 
     /**
@@ -229,11 +274,9 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
 
                     startDot = clickedDot;
 
-                    if (startDot.isDotFullyConnected()) {
-                        startDot = null;
-                    } else {
-                        startDot.setFill(game.getCurrentPlayer().getPlayerColor());
-                    }
+
+                    startDot.setFill(game.getCurrentPlayer().getPlayerColor());
+
 
 
                 } else if (game.getUtility().areAdjacentDots(startDot, clickedDot)) {
@@ -241,7 +284,13 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
                     if (getLineBetweenDots(startDot, clickedDot) == null) {
                         game.getCurrentPlayer().setPlayerMove(null);
                         drawLineBetweenDots(startDot, clickedDot);
-                        startDot.setFill(Color.BLACK);
+
+                        if(currentThemeDark) {
+                            startDot.setFill(currentThemeOpposite);
+                        }
+                        else {
+                            startDot.setFill(currentTheme);
+                        }
 
 
 
@@ -290,48 +339,7 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
     }
 
 
-    public void startAIVsAIGame() {
 
-    }
-
-
-
-
-
-
-
-
-
-
-
-    public boolean isGameOver() {
-//        if(game.isGameOver()) {
-//            if(isAIVsAI) {
-//
-//
-//            }
-//            else if(!isPlayerVsPlayer) {
-//
-//            }
-//
-//            int player1S = game.getPlayer1().getPlayerScore();
-//            int player2S = game.getPlayer2().getPlayerScore();
-//            String winnerPlayer;
-//
-//            if(player1S>player2S) {
-//                winnerPlayer = game.getPlayer1().getName();
-//            }
-//            else {
-//                winnerPlayer = game.getPlayer2().getName();
-//
-//            }
-//            gameOverText.setText("Game Over! Player " + winnerPlayer+  " won. Final Score: " + player1S+"-"+player2S);
-//            gameScreen.setScene(gameOverScene);
-//            return true;
-//        }
-//        return false;
-        return false;
-    }
 
     private void drawDots(Pane pane) {
         double spacing = 500.0 / GRID_SIZE;
@@ -342,6 +350,15 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
                 double y = row * spacing + DOT_RADIUS;
 
                 Dot dot = new Dot(x, y, DOT_RADIUS, row, col);
+
+
+                if(currentThemeDark) {
+                    dot.setFill(Color.WHITE);
+                }
+                else {
+                    dot.setFill(Color.BLACK);
+                }
+
 
                 dot.setOnMouseEntered(e -> {
                     dot.getScene().setCursor(Cursor.HAND);
@@ -373,9 +390,7 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
         player1ScoreText.setText("Player 1 score: 0");
         player2ScoreText.setText("Player 2 score: 0");
         infoText.setText("Player 1 turn");
-//        game.resetGame();
-
-
+        game.resetGame();
 
         drawDots(pane);
 
@@ -383,8 +398,9 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
 
     public void startGame() {
         gameScreen.setScene(gameScene);
-
-       game.startGame();
+        removeCurrentDots();
+        drawDots(pane);
+        game.startGame();
 
     }
 
@@ -408,6 +424,7 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
 
     @Override
     public void onMoveMade(SquaresToDrawForUI move) {
+
 
         if(game.isPlayer1Turn()) {
             infoText.setText("Player 1 is playing");
@@ -461,6 +478,24 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
             }
 
 
+
+
+    }
+
+    @Override
+    public void gameOver() {
+        if(game.isGameOver()) {
+            System.out.println("Game Over");
+            int winnerPlayer;
+            if(game.getScorePlayer1() > game.getScorePlayer2()) {
+                winnerPlayer = 1;
+            }
+            else {
+                winnerPlayer = 2;
+            }
+            gameOverText.setText("Game Over! Player " + winnerPlayer+  " won. Final Score: " + game.getScorePlayer1() + "-"+game.getScorePlayer2());
+            gameScreen.setScene(gameOverScene);
+        }
     }
 
 
@@ -579,6 +614,10 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
         }
         //        System.out.println("No line found between dots.");
         return null;
+    }
+
+    public void removeCurrentDots() {
+        pane.getChildren().removeIf(node -> node instanceof Dot);
     }
 
 }

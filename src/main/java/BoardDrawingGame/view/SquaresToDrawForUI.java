@@ -1,6 +1,4 @@
-package BoardDrawingGame.src;
-
-import javafx.scene.paint.Color;
+package BoardDrawingGame.view;
 
 public class SquaresToDrawForUI {
 	private boolean isSquare;
@@ -18,27 +16,25 @@ public class SquaresToDrawForUI {
 		setSecondSquare(new Line[4]);
 	}
 
-	Line[] getFirstSquare() {
+	public Line[] getFirstSquare() {
 		return firstSquare;
 	}
 
-	void setFirstSquare(Line[] firstSquare) {
+	public void setFirstSquare(Line[] firstSquare) {
 		this.firstSquare = firstSquare;
 	}
 
-	Line[] getSecondSquare() {
+	public Line[] getSecondSquare() {
 		return secondSquare;
 	}
 
-	void setSecondSquare(Line[] secondSquare) {
+	public void setSecondSquare(Line[] secondSquare) {
 		this.secondSquare = secondSquare;
 	}
 
-	int getPlayer1Score() {
-		return player1Score;
-	}
+	int getPlayer1Score() { return player1Score; }
 
-	void setPlayer1Score(int player1Score) {
+	public void setPlayer1Score(int player1Score) {
 		this.player1Score = player1Score;
 	}
 
@@ -46,31 +42,31 @@ public class SquaresToDrawForUI {
 		return player2Score;
 	}
 
-	void setPlayer2Score(int player2Score) {
+	public void setPlayer2Score(int player2Score) {
 		this.player2Score = player2Score;
 	}
 
-	boolean isSquare() {
+	public boolean isSquare() {
 		return isSquare;
 	}
 
-	void setSquare(boolean isSquare) {
+	public void setSquare(boolean isSquare) {
 		this.isSquare = isSquare;
 	}
 
-	Line getLineToDraw() {
+	public Line getLineToDraw() {
 		return lineToDraw;
 	}
 
-	void setLineToDraw(Line lineToDraw) {
+	public void setLineToDraw(Line lineToDraw) {
 		this.lineToDraw = lineToDraw;
 	}
 
-	int getCurrentMovePoint() {
+	public int getCurrentMovePoint() {
 		return currentMovePoint;
 	}
 
-	void setCurrentMovePoint(int currentMovePoint) {
+	public void setCurrentMovePoint(int currentMovePoint) {
 		this.currentMovePoint = currentMovePoint;
 	}
 	

@@ -1,15 +1,18 @@
-package BoardDrawingGame.src;
+package BoardDrawingGame.Entities;
 
 public class Board {
+
+	private int GRIDSIZE;
 	private boolean[][] horizontalLines;
 	private boolean[][] verticalLines;
 	
-	public Board(){
-		setHorizontalLines(new boolean [6][5]);
-		setVerticalLines(new boolean [5][6]);
+	public Board(int gridsize) {
+		this.GRIDSIZE = gridsize;
+		setHorizontalLines(new boolean [gridsize+1][gridsize]);
+		setVerticalLines(new boolean [gridsize][gridsize+1]);
 	}
 
-	boolean[][] getHorizontalLines() {
+	public boolean[][] getHorizontalLines() {
 		return horizontalLines;
 	}
 
@@ -17,7 +20,7 @@ public class Board {
 		this.horizontalLines = horizontalLines;
 	}
 
-	boolean[][] getVerticalLines() {
+	public boolean[][] getVerticalLines() {
 		return verticalLines;
 	}
 
@@ -25,7 +28,7 @@ public class Board {
 		this.verticalLines = verticalLines;
 	}
 	
-	void markLine(String horizontalOrVertical,int horizontalIndex, int verticalIndex)
+	public void markLine(String horizontalOrVertical, int horizontalIndex, int verticalIndex)
 	{
 		if(horizontalOrVertical.equalsIgnoreCase("H")){
 			horizontalLines[horizontalIndex][verticalIndex]  = true;

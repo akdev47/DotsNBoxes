@@ -1,13 +1,17 @@
-package BoardDrawingGame.src;
+package BoardDrawingGame.logic;
 
+import BoardDrawingGame.Entities.Board;
+import BoardDrawingGame.Entities.Player;
+import BoardDrawingGame.logic.Utility;
+import BoardDrawingGame.view.Line;
 import java.util.Random;
 import javafx.scene.paint.Color;
 
 public class AIPlayer extends Player {
-	Board board; 
-	Utility utility;
+	private final Board board;
+	private final Utility utility;
 
-	Color playerColor;
+	private final Color playerColor;
 
 	public AIPlayer (Board board, Utility utility, Color playerColor)
 	{

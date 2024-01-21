@@ -1,31 +1,35 @@
-package BoardDrawingGame.src;
+package BoardDrawingGame.logic;
 
+import BoardDrawingGame.Entities.Board;
+import BoardDrawingGame.Entities.Player;
+import BoardDrawingGame.view.Line;
+import BoardDrawingGame.view.SquaresToDrawForUI;
 import javafx.animation.KeyFrame;
-import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 public class Game {
 
-	Player player1;
-	Player player2;
+	private Player player1;
+	private Player player2;
 
-	String gameMode = "PlayerVSPlayer";
+	private String gameMode = "PlayerVSPlayer";
 
-	Board board;
-	Utility utility;
+	private Board board;
+	private Utility utility;
 
-	Timeline timeline;
-	Timeline playerVSAItimeline;
+	private Timeline timeline;
+	private Timeline playerVSAItimeline;
 
-	int moveCountPlayer1 = 1;
-	int moveCountPlayer2 = 1;
+	private int moveCountPlayer1 = 1;
+	private int moveCountPlayer2 = 1;
 
-	int scorePlayer1 = 0;
-	int scorePlayer2 = 0;
+	private int scorePlayer1 = 0;
+	private int scorePlayer2 = 0;
 
-	boolean player1Turn = true;
+	private boolean gameOver = false;
+	private boolean player1Turn = true;
 	private MoveMadeListener moveMadeListener;
 
 //	public static void setUpGame(Board board, Utility utility) {
@@ -101,7 +105,7 @@ public class Game {
 	public void startGame() {
 
 
-		board = new Board();
+		board = new Board(5);
 		utility = new Utility(board);
 
 		setUpGameDEMO(board, utility);
@@ -165,6 +169,9 @@ public class Game {
 					callAIMove();
 				}
 
+				if(utility.isGameFinished()) {
+					gameIsOver();
+				}
 
 				// HERE: Do not forget to send squaresToDrawForUI  to the UI to draw this line and squares and points
 
@@ -194,33 +201,63 @@ public class Game {
 					callAIMove();
 				}
 
+				if(utility.isGameFinished()) {
+					gameIsOver();
+				}
+
 				// HERE: Do not forget to send squaresToDrawForUI  to the UI to draw this line and squares and points
 
 			}
 		} else {
-
-			timeline.stop();
-
-			System.out.println("Game Ended");
-			System.out.println("Player 1 Score: " + scorePlayer1 + " Player 1 Move Count: " + --moveCountPlayer1);
-			System.out.println("Player 2 Score: " + scorePlayer2 + " Player 2 Move Count: " + --moveCountPlayer2);
-			if (scorePlayer1 > scorePlayer2) {
-				System.out.println("Player 1 won the game");
-			} else if (scorePlayer1 < scorePlayer2) {
-				System.out.println("Player 2 won the game");
-			} else {
-				System.out.println("Tie");
-			}
+			gameIsOver();
 		}
 	}
-	public static void main(String[] args) {
+
+	public void gameIsOver() {
+		gameOver = true;
+
+		if (moveMadeListener != null) {
+			moveMadeListener.gameOver();
+		}
+
+		if(timeline!=null) {
+			timeline.stop();
+		}
+
+		System.out.println("Game Ended");
+		System.out.println("Player 1 Score: " + scorePlayer1 + " Player 1 Move Count: " + --moveCountPlayer1);
+		System.out.println("Player 2 Score: " + scorePlayer2 + " Player 2 Move Count: " + --moveCountPlayer2);
+		if (scorePlayer1 > scorePlayer2) {
+			System.out.println("Player 1 won the game");
+		} else if (scorePlayer1 < scorePlayer2) {
+			System.out.println("Player 2 won the game");
+		} else {
+			System.out.println("Tie");
+		}
+	}
+
+	public boolean isGameOver() {
+		return gameOver;
+	}
+
+	public void resetGame() {
+		System.out.println("Reseted Game");
+		timeline = null;
+		playerVSAItimeline = null;
+		player1 = null;
+		player2 = null;
+		moveCountPlayer1 = 1;
+		moveCountPlayer2 = 1;
+		scorePlayer1 = 0;
+		scorePlayer2 = 0;
+		player1Turn = true;
 
 	}
 	
 	static void testBoard()
 	{
 
-		Board board = new Board(); 
+		Board board = new Board(5);
 		board.markLine("H", 1, 2);
 		board.markLine("V", 1, 2);
 		board.markLine("V", 1, 3);

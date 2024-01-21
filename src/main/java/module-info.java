@@ -1,10 +1,14 @@
-module com.example.dotsandboxes {
+module src {
     requires javafx.controls;
     requires javafx.fxml;
 
     requires org.kordamp.ikonli.javafx;
     requires com.almasb.fxgl.all;
 
-    opens com.example.dotsandboxes to javafx.fxml;
-    exports com.example.dotsandboxes;
+    exports BoardDrawingGame.logic;
+    opens BoardDrawingGame.logic to javafx.fxml, javafx.graphics;
+    exports BoardDrawingGame.view;
+    opens BoardDrawingGame.view to javafx.fxml, javafx.graphics;
+    exports BoardDrawingGame.Entities;
+    opens BoardDrawingGame.Entities to javafx.fxml, javafx.graphics;
 }

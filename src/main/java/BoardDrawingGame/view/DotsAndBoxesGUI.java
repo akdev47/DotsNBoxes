@@ -1,6 +1,7 @@
 package BoardDrawingGame.view;
 
 
+import BoardDrawingGame.Entities.Player;
 import BoardDrawingGame.logic.Game;
 import BoardDrawingGame.logic.*;
 import java.io.FileInputStream;
@@ -82,8 +83,6 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
         infoText = new Text("Player 1 turn");
         infoText.setFill(Color.WHITE);
         infoText.setStyle("-fx-font-size: 14;");
-
-
 
         //        buttonBox = new HBox(resetButton);
         //        buttonBox.setLayoutX(130);
@@ -261,7 +260,7 @@ public class DotsAndBoxesGUI extends Application implements MoveMadeListener {
      */
     private void handleMouseClick(MouseEvent event)  {
 
-        if(!game.getGameMode().equals("AIvsAI")) {
+        if(game.getGameMode().equals("PlayerVSPlayer") || (game.getGameMode().equals("PlayerVSAI") && game.isPlayer1Turn())) {
 
             Object source = event.getSource();
 

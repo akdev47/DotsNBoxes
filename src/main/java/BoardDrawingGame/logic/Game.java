@@ -104,7 +104,6 @@ public class Game {
 
 	public void startGame() {
 
-
 		board = new Board(5);
 		utility = new Utility(board);
 

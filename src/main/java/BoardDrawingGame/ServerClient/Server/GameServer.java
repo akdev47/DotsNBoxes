@@ -16,9 +16,9 @@ import java.util.*;
  */
 public class GameServer extends SocketServer {
 
-    private final List<ClientHandler> clients;
+        private final List<ClientHandler> clients;
 
-    private final List<ClientHandler> queueList;
+        private final List<ClientHandler> queueList;
 
     Map<Game,List<ClientHandler>> gamesMap = new HashMap<>();
     

@@ -1,0 +1,7 @@
+module:src
+BoardDrawingGame.Entities
+BoardDrawingGame.logic
+BoardDrawingGame.ServerClient
+BoardDrawingGame.ServerClient.Client
+BoardDrawingGame.ServerClient.Server
+BoardDrawingGame.view

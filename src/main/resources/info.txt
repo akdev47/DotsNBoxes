@@ -1,0 +1,3 @@
+We had this image for the start game, but we could not add it to the final project
+as we kept on getting errors that the compiler could not find the URL of the image, but if you
+can fix it that would be awesome.

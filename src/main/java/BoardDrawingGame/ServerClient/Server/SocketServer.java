@@ -1,4 +1,4 @@
-package BoardDrawingGame.ServerClient;
+package BoardDrawingGame.ServerClient.Server;
 
 
 import java.io.IOException;

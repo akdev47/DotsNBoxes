@@ -1,4 +1,4 @@
-package BoardDrawingGame.ServerClient.protocol;
+package BoardDrawingGame.ServerClient;
 
 /**
  * Protocol class with constants for creating BoardDrawingGame.ServerClient.protocol messages
@@ -23,6 +23,10 @@ public final class Protocol {
 
     public static final String GAMEOVER = "GAMEOVER";
 
+    /**
+     * Private constructor to prevent instantiation of the Protocol class.
+     * This constructor ensures that the Protocol class cannot be instantiated.
+     */
     private Protocol() {
         // Private constructor to prevent instantiation
     }

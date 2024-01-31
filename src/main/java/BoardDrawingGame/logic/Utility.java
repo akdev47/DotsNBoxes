@@ -4,16 +4,40 @@ import BoardDrawingGame.Entities.Board;
 import BoardDrawingGame.view.Dot;
 import BoardDrawingGame.view.Line;
 import BoardDrawingGame.view.SquaresToDrawForUI;
-
+/**
+ * The Utility class provides utility methods as an helper class for calculating points,
+ * checking game completion,and determining squares to draw on the UI in a Dots and Boxes game.
+ * This class is responsible for various game related calculations and checks the gameplay logic.
+ *
+ * It includes methods for calculating points, checking game completion conditions, and determining
+ * the squares to draw on the UI based on the moves made during the game.
+ *
+ * @author Ali Kaan Uysal
+ * @author Bas Van Dijk
+ */
 public class Utility {
 	private Board board;
-	
+
+	/**
+	 * Constructs a Utility object with the specified game board.
+	 *
+	 * @param board The game board.
+	 */
 	public Utility (Board board)
 	{
 		this.board = board;
 	}
-	
-	int calculatePoint (String horizontalOrVertical,int horizontalIndex, int verticalIndex)
+
+	/**
+	 * Calculates the points for a specific move based on its position and orientation.
+	 * The points are determined by the lines surrounding the move on the game board.
+	 *
+	 * @param horizontalOrVertical The orientation of the move ("H" for horizontal, "V" for vertical).
+	 * @param horizontalIndex      The horizontal index of the move.
+	 * @param verticalIndex        The vertical index of the move.
+	 * @return The calculated points for the move.
+	 */
+	public int calculatePoint (String horizontalOrVertical,int horizontalIndex, int verticalIndex)
 
 	{
 		int point= 0;
@@ -50,9 +74,68 @@ public class Utility {
 			
 		return point;	
 	}
+
+	/**
+	 * Calculates points for a move based on its server index.
+	 *
+	 * @param serverIndex The server index of the move.
+	 * @return The calculated points for the move.
+	 */
+	public int calculatePointWithServerIndex(int serverIndex) {
+		//This method calls the previous calculatePoints method but calls it by converting the server
+		// index into its appropriate format. (With a string and two integers.)
+		String hOrV;
+		int horizontalIndex;
+		int verticalIndex;
+
+		if(serverIndex>=0 && serverIndex<=4) {
+			hOrV = "H";
+		} else if (serverIndex>=5 && serverIndex<=10) {
+			hOrV = "V";
+		} else if (serverIndex>=11 && serverIndex <= 15) {
+			hOrV = "H";
+		} else if (serverIndex>=16 && serverIndex <= 21) {
+			hOrV = "V";
+		}else if (serverIndex>=22 && serverIndex <= 26) {
+			hOrV = "H";
+		} else if (serverIndex>=27 && serverIndex <= 32) {
+			hOrV = "V";
+		} else if (serverIndex>=33 && serverIndex <= 37) {
+			hOrV = "H";
+		}else if (serverIndex>=38 && serverIndex <= 43) {
+			hOrV = "V";
+		}
+		else if (serverIndex>=44 && serverIndex <= 48) {
+			hOrV = "H";
+		}
+		else if (serverIndex>=49 && serverIndex <= 54) {
+			hOrV = "V";
+		}
+		else  {
+			hOrV = "H";
+		}
+
+		if(hOrV.equals("H")) {
+			horizontalIndex = serverIndex/ 10;
+			verticalIndex = (serverIndex % 10) - horizontalIndex;
+		}
+		else {
+			horizontalIndex = serverIndex/ 11;
+			verticalIndex =  (serverIndex % 11) - 5;
+		}
+		return calculatePoint(hOrV,horizontalIndex,verticalIndex);
+	}
 	
-	//This method calculates points for only top horizontal lines whose horizontal index is 0
-	int calculatePointForTopHorizontalLines (int horizontalIndex, int verticalIndex)
+
+
+	/**
+	 * This method calculates points for only top horizontal lines whose horizontal index is 0.
+	 *
+	 * @param horizontalIndex The horizontalIndex of the line.
+	 * @param verticalIndex The horizontalIndex of the line.
+	 * @return int The calculated points for the move.
+	 */
+	public int calculatePointForTopHorizontalLines (int horizontalIndex, int verticalIndex)
 	{
 		int point= 1;
 		if(board.getHorizontalLines()[horizontalIndex][verticalIndex] == true)
@@ -80,8 +163,15 @@ public class Utility {
 		
 	}
 
-	//This method calculates points for only top horizontal lines whose horizontal index is 0
-	int calculatePointForBottomHorizontalLines (int horizontalIndex, int verticalIndex)
+
+	/**
+	 * This method calculates points for only bottom horizontal lines whose horizontal index is 0.
+	 *
+	 * @param horizontalIndex The horizontalIndex of the line.
+	 * @param verticalIndex The horizontalIndex of the line.
+	 * @return int The calculated points for the move.
+	 */
+	public int calculatePointForBottomHorizontalLines (int horizontalIndex, int verticalIndex)
 	{
 		int point= 1;
 		if(board.getHorizontalLines()[horizontalIndex][verticalIndex] == true)
@@ -109,8 +199,15 @@ public class Utility {
 		
 	}
 	
-	//This method calculates points for only left vertical lines whose vertical index is 0
-	int calculatePointForLeftVerticalLines (int horizontalIndex, int verticalIndex)
+
+	/**
+	 * This method calculates points for only left vertical lines whose vertical index is 0.
+	 *
+	 * @param horizontalIndex The horizontalIndex of the line.
+	 * @param verticalIndex The horizontalIndex of the line.
+	 * @return int The calculated points for the move.
+	 */
+	public int calculatePointForLeftVerticalLines (int horizontalIndex, int verticalIndex)
 	{
 		int point= 1;
 		if(board.getVerticalLines()[horizontalIndex][verticalIndex] == true)
@@ -138,8 +235,15 @@ public class Utility {
 		
 	}
 
-	//This method calculates points for only right vertical lines whose vertical index is 5
-		int calculatePointForRightVerticalLines (int horizontalIndex, int verticalIndex)
+
+	/**
+	 * This method calculates points for only right vertical lines whose vertical index is 5.
+	 *
+	 * @param horizontalIndex The horizontalIndex of the line.
+	 * @param verticalIndex The horizontalIndex of the line.
+	 * @return int The calculated points for the move.
+	 */
+	public int calculatePointForRightVerticalLines (int horizontalIndex, int verticalIndex)
 		{
 			int point= 1;
 			if(board.getVerticalLines()[horizontalIndex][verticalIndex] == true)
@@ -168,7 +272,7 @@ public class Utility {
 		}
 		
 		//This method calculates points for only top horizontal lines whose horizontal index is 0
-		int calculatePointForMiddleHorizontalLines (int horizontalIndex, int verticalIndex)
+		public int calculatePointForMiddleHorizontalLines (int horizontalIndex, int verticalIndex)
 		{
 		
 			if(board.getHorizontalLines()[horizontalIndex][verticalIndex] == true)
@@ -189,7 +293,14 @@ public class Utility {
 		}
 		
 		//This method calculates points for only top horizontal lines whose horizontal index is 0
-		int calculatePointForMiddleVerticalLines (int horizontalIndex, int verticalIndex)
+	/**
+	 * This method calculates points for MiddleVerticalLines.
+	 *
+	 * @param horizontalIndex The horizontalIndex of the line.
+	 * @param verticalIndex The horizontalIndex of the line.
+	 * @return int The calculated points for the move.
+	 */
+		public int calculatePointForMiddleVerticalLines (int horizontalIndex, int verticalIndex)
 		{
 		
 			if(board.getVerticalLines()[horizontalIndex][verticalIndex] == true)
@@ -210,8 +321,13 @@ public class Utility {
 	
 			
 		}
-		
-		boolean isGameFinished()
+
+	/**
+	 * Checks if the game is finished by examining the state of horizontal and vertical lines on the board.
+	 *
+	 * @return true if the game is finished, false otherwise.
+	 */
+	public boolean isGameFinished()
 		{
 			
 			for(int i=0;i<6;i++)
@@ -236,7 +352,14 @@ public class Utility {
 			
 		}
 
-		boolean isOnlyThreePointLinesLeft()
+
+
+	/**
+	 * Checks if there are only three-point lines left on the board.
+	 *
+	 * @return true if there are only three-point lines left, false otherwise.
+	 */
+	public boolean isOnlyThreePointLinesLeft()
 		{
 			
 			for(int i=0;i<6;i++)
@@ -260,9 +383,18 @@ public class Utility {
 			return true;
 			
 		}
-		
-		SquaresToDrawForUI getSquaresToDrawForUI(Line move)
+
+	/**
+	 * Gets the squares to draw for the GUI based on the move made.
+	 *
+	 * @param move The move made on the board.
+	 * @return SquaresToDrawForUI object containing information about squares to draw and points earned.
+	 */
+	public SquaresToDrawForUI getSquaresToDrawForUI(Line move)
 		{
+
+			// the purpose of this method is to give the GUI information on where the lines that
+			// form a square are located.
 			SquaresToDrawForUI squaresToDrawForUI = new SquaresToDrawForUI();
 			int point = calculatePoint(move.getHorizontalOrVertical(), move.getHorizontalIndex(), move.getVerticalIndex());
 			if (point == 4) // we should create square to draw for the UI
@@ -537,6 +669,13 @@ public class Utility {
 			return squaresToDrawForUI;
 		}
 
+	/**
+	 * Checks if two dots are adjacent to each other.
+	 *
+	 * @param startDot The starting dot.
+	 * @param endDot   The ending dot.
+	 * @return true if the dots are adjacent, false otherwise.
+	 */
 	public boolean areAdjacentDots(Dot startDot, Dot endDot) {
 		int row1 = startDot.getRow();
 		int col1 = startDot.getCol();
@@ -546,6 +685,95 @@ public class Utility {
 		return (Math.abs(row1 - row2) == 1 && col1 == col2) || (Math.abs(col1 - col2) == 1 && row1 == row2);
 	}
 
+
+	/**
+	 * Converts a server index to a Line object representing the corresponding line on the game board.
+	 *
+	 * @param serverIndex The server index to be converted.
+	 * @return A Line object representing the line corresponding to the server index.
+	 */
+	public Line getServerIndexToLine(int serverIndex) {
+		Line line = new Line();
+		String hOrV;
+		int horizontalIndex;
+		int verticalIndex;
+
+		if(serverIndex>=0 && serverIndex<=4) {
+			hOrV = "H";
+		} else if (serverIndex>=5 && serverIndex<=10) {
+			hOrV = "V";
+		} else if (serverIndex>=11 && serverIndex <= 15) {
+			hOrV = "H";
+		} else if (serverIndex>=16 && serverIndex <= 21) {
+			hOrV = "V";
+		}else if (serverIndex>=22 && serverIndex <= 26) {
+			hOrV = "H";
+		} else if (serverIndex>=27 && serverIndex <= 32) {
+			hOrV = "V";
+		} else if (serverIndex>=33 && serverIndex <= 37) {
+			hOrV = "H";
+		}else if (serverIndex>=38 && serverIndex <= 43) {
+			hOrV = "V";
+		}
+		else if (serverIndex>=44 && serverIndex <= 48) {
+			hOrV = "H";
+		}
+		else if (serverIndex>=49 && serverIndex <= 54) {
+			hOrV = "V";
+		}
+		else  {
+			hOrV = "H";
+		}
+
+		line.setHorizontalOrVertical(hOrV);
+		if(hOrV.equals("H")) {
+			horizontalIndex = serverIndex/ 10;
+			verticalIndex = (serverIndex % 10) - horizontalIndex;
+		}
+		else {
+			horizontalIndex = serverIndex/ 11;
+			verticalIndex =  (serverIndex % 11) - 5;
+		}
+		line.setHorizontalIndex(horizontalIndex);
+		line.setVerticalIndex(verticalIndex);
+
+		return line;
+
+	}
+
+	/**
+	 * Gets the current game board.
+	 *
+	 * @return The current game board.
+	 */
+	public Board getBoard() {
+		return board;
+	}
+
+	/**
+	 * Creates a deep copy of the given game board.
+	 *
+	 * @param board The original game board to be copied.
+	 * @return A new Board object representing a deep copy of the original board.
+	 */
+	public Board copyBoard(Board board)
+	{
+		Board copiedBoard = new Board(5);
+		for(int i=0;i<6;i++)
+			for(int j=0;j<5;j++)
+			{
+				copiedBoard.getHorizontalLines()[i][j] = board.getHorizontalLines()[i][j];
+			}
+
+		for(int i=0;i<5;i++)
+			for(int j=0;j<6;j++)
+			{
+				copiedBoard.getVerticalLines()[i][j] = board.getVerticalLines()[i][j];
+			}
+
+
+		return copiedBoard;
+	}
 
 
 		

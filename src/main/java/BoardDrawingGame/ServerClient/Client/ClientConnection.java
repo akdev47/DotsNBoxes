@@ -3,13 +3,13 @@ package BoardDrawingGame.ServerClient.Client;
 
 
 import BoardDrawingGame.ServerClient.SocketConnection;
+import BoardDrawingGame.ServerClient.Protocol;
 import java.io.IOException;
-import java.util.List;
 
 
 public class ClientConnection extends SocketConnection {
 
-    private AIClient AIClient;
+    private final Client client;
 
     /**
      * Constructs a ClientConnection with the specified server address, port, and associated ChatClient.
@@ -19,58 +19,75 @@ public class ClientConnection extends SocketConnection {
      * @param AIClient The associated ChatClient instance.
      * @throws IOException If an I/O error occurs while establishing the connection.
      */
-    protected ClientConnection(String address, int port, AIClient AIClient) throws IOException {
+    protected ClientConnection(String address, int port, Client AIClient) throws IOException {
         super(address, port);
         super.start();
-        this.AIClient = AIClient;
+        this.client = AIClient;
     }
 
     /**
      * Handles incoming messages received from the server.
-     * Parses the message and notifies the associated ChatClient of chat messages.
+     * Parses the message and notifies the associated client of the protocol command.
      *
-     * @param message The incoming message from the server.
+     * @param message The incoming message in appliance of the protocol from the server..
      */
     @Override
-    protected void handleMessage(String message) {
+    protected synchronized void handleMessage(String message) {
 
         String[] parts = message.split("~");
 
-        if (parts.length == 3 && parts[0].equals("FROM")) {
-            String username = parts[1];
-            String chatMessage = parts[2];
-            AIClient.recieveChatMessage(username, chatMessage);
+        if(parts.length== 3 && parts[0].equals(Protocol.NEWGAME)) {
+            String player1Name = parts[1];
+            String player2Name = parts[2];
+            client.recieveNewGameCommand(player1Name, player2Name);
         }
-        
-        if(parts.length == 1 && parts[0].equals("ALREADYLOGGEDIN")) {
-            AIClient.recieveLogInStatus(false);
-        } else if (parts.length == 1 && parts[0].equals("LOGIN")) {
-            AIClient.recieveLogInStatus(true);
+
+        if(parts.length== 3 && parts[0].equals(Protocol.GAMEOVER)) {
+            String reason = parts[1];
+            String winnerName = parts[2];
+            client.recieveGameOverCommand(reason, winnerName);
+        }
+
+
+        if(parts.length== 2 && parts[0].equals(Protocol.MOVE)) {
+            System.out.println("Client is recieveing move");
+            String move = parts[1];
+            client.recieveMove(move);
+        }
+
+        if(parts.length==2 && parts[0].equals(Protocol.HELLO)) {
+            String serverDescription = parts[1];
+            client.reieveHelloCommand(serverDescription);
+        }
+
+
+        if(parts.length == 1 && parts[0].equals(Protocol.ALREADYLOGGEDIN)) {
+            client.recieveLogInStatus(false);
+        } else if (parts.length == 1 && parts[0].equals(Protocol.LOGIN)) {
+            client.recieveLogInStatus(true);
         } else if (parts[0].equals("LIST")) {
-            AIClient.recieveListCommand(message);
+            client.recieveListCommand(message);
         }
     }
 
     /**
      * Handles the event when the connection to the server is disconnected.
-     * Notifies the associated ChatClient and closes the connection.
+     * Notifies the associated client and closes the connection.
      */
     @Override
     protected void handleDisconnect() {
         System.out.println("Disconnected");
-        AIClient.handleDisconnect();
-        AIClient.close();
+        client.handleDisconnect();
+        client.close();
     }
 
 
     /**
-     * Sends a chat message to the server.
+     * Sends a hello command to the server.
      *
-     * @param message The chat message to be sent.
      */
-    public void sendChatMessage(String message) {
-
-        String formattedMessage = "SAY~" + message;
+    public void sendHello(String description) {
+        String formattedMessage = "HELLO~" + description;
         super.sendMessage(formattedMessage);
     }
 
@@ -84,6 +101,14 @@ public class ClientConnection extends SocketConnection {
     }
 
     /**
+     * Sends the queue command to the server.
+     *
+     */
+    public void sendQueue() {
+        super.sendMessage("QUEUE");
+    }
+
+    /**
      * Sends the username to the server.
      *
      * @param username The username to be sent.
@@ -91,6 +116,16 @@ public class ClientConnection extends SocketConnection {
     public void sendUsername(String username) {
 
         String formattedMessage = "LOGIN~" + username;
+        super.sendMessage(formattedMessage);
+    }
+
+    /**
+     * Sends the move to the server.
+     *
+     * @param move The move to be sent.
+     */
+    public void sendMove(int move) {
+        String formattedMessage = "MOVE~" + move;
         super.sendMessage(formattedMessage);
     }
 
